@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { twMerge } from "tailwind-merge";
 import type { SortDirection, SortKey } from "@/hooks/useTokenSorting";
 
 type Phase = "new" | "final" | "migrated" | "watchlist";
@@ -30,10 +31,11 @@ export function TokenTableHeader({
   const isMCapActive = sortKey === "marketCap";
 
   return (
-    <div className="border-b border-slate-800/80 px-4 pt-3 pb-2 md:px-6">
+    <div className="border-b border-white/10 px-4 pt-3 pb-2 md:px-6">
+      {/* Phase tabs + sort summary */}
       <div className="mb-2 flex items-center justify-between gap-2">
         {/* Phase pills */}
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-slate-900/80 p-1">
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-slate-900/80 p-0.5">
           {phases.map((p) => {
             const active = p.id === activePhase;
             return (
@@ -41,34 +43,46 @@ export function TokenTableHeader({
                 key={p.id}
                 type="button"
                 onClick={() => onPhaseChange(p.id)}
-                className={
+                className={twMerge(
+                  "rounded-full px-3 py-1 text-[11px] transition-colors cursor-pointer",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-axiom-accent focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
                   active
-                    ? "rounded-full bg-axiom-accent/90 px-3 py-1 text-[11px] font-medium text-slate-950 shadow-sm shadow-axiom-accent/40"
-                    : "rounded-full px-3 py-1 text-[11px] text-axiom-textSecondary hover:bg-slate-800/80"
-                }
+                    ? "bg-axiom-accent/90 text-slate-950 shadow-sm shadow-axiom-accent/40"
+                    : "text-axiom-textSecondary hover:bg-slate-800/80"
+                )}
               >
                 {p.label}
               </button>
             );
           })}
         </div>
+
+        {/* Sort summary (desktop only) */}
+        <div className="hidden text-[11px] text-axiom-textMuted md:block">
+          Sorted by{" "}
+          <span className="font-mono text-axiom-textPrimary">{sortKey}</span>{" "}
+          ({direction === "asc" ? "asc" : "desc"})
+        </div>
       </div>
 
       {/* Column headers row */}
       <div
-        className="grid items-center text-[11px] uppercase tracking-wide text-axiom-textMuted"
-        style={{
-          gridTemplateColumns:
-            "minmax(0,2.5fr) repeat(4,minmax(0,1.1fr)) minmax(0,2fr) 112px",
-        }}
+        className={twMerge(
+          "grid items-center gap-2 text-[11px] uppercase tracking-wide text-axiom-textMuted",
+          "grid-cols-[minmax(0,2.5fr)_repeat(4,minmax(0,1.1fr))_minmax(0,2fr)_112px]"
+        )}
       >
         <div className="text-left">Pair</div>
 
-        {/* MCap with sort */}
+        {/* MCap with sort (focus-visible ring) */}
         <button
           type="button"
           onClick={() => onSortChange("marketCap")}
-          className="flex items-center gap-1 text-left"
+          className={twMerge(
+            "flex items-center gap-1 text-left rounded-full px-2 py-1",
+            "cursor-pointer hover:text-axiom-textPrimary",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-axiom-accent focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+          )}
         >
           <span>MCap</span>
           <span className="text-[10px]">

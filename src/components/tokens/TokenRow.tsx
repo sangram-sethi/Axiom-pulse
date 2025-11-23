@@ -66,7 +66,8 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
         "group relative grid items-center border-t border-slate-800/80 text-sm",
         rowPadding,
         "grid-cols-[minmax(0,2.5fr)_repeat(4,minmax(0,1.1fr))_minmax(0,2fr)_112px]",
-        "hover:bg-slate-900/40 transition-colors duration-150 ease-smooth"
+        "hover:bg-slate-900/40 transition-[background,transform] duration-150 ease-smooth",
+        "md:hover:translate-y-0.5 md:hover:scale-[1.002]"
       )}
     >
       {/* Left accent bar on hover */}

@@ -10,7 +10,7 @@ interface Props {
 
 export function TokenTableError({ message, onRetry }: Props) {
   return (
-    <div className="px-4 py-8 text-center text-sm text-axiom-textSecondary md:px-6">
+    <div className="px-4 py-8 text-center text-sm text-axiom-textSecondary md:px-6" role="alert" aria-live="polite">
       <p className="mb-2 text-axiom-textPrimary">
         Failed to load tokens.
       </p>

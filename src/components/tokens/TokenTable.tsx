@@ -87,6 +87,8 @@ export function TokenTable() {
     useTokenSorting(phaseFiltered);
 
   const trimmedQuery = query.trim();
+  const hasWatchlist = watchlistIds.length > 0;
+
   const secondsAgo =
     lastUpdated != null
       ? Math.max(0, Math.round((now - lastUpdated) / 1000))
@@ -95,7 +97,7 @@ export function TokenTable() {
   return (
     <ErrorBoundary>
       <div className="w-full overflow-x-auto">
-        {/* Main card container */}
+        {/* Main card container (glass-style) */}
         <div
           className="min-w-[880px] rounded-2xl border border-slate-800/80
                      bg-gradient-to-b from-slate-950/90 to-slate-900/90
@@ -157,7 +159,45 @@ export function TokenTable() {
             {/* Empty state: no rows after filtering */}
             {!isLoading && !isError && sorted.length === 0 && (
               <div className="px-4 py-10 text-center text-sm text-axiom-textSecondary md:px-6">
-                {trimmedQuery ? (
+                {phase === "watchlist" ? (
+                  <>
+                    {!hasWatchlist && !trimmedQuery && (
+                      <>
+                        <p className="mb-1 text-axiom-textPrimary">
+                          Your watchlist is empty.
+                        </p>
+                        <p className="text-[11px] text-axiom-textMuted">
+                          Use the watchlist button in the table rows to save
+                          tokens here.
+                        </p>
+                      </>
+                    )}
+
+                    {hasWatchlist && trimmedQuery && (
+                      <>
+                        <p className="mb-1 text-axiom-textPrimary">
+                          No watchlisted tokens match “{trimmedQuery}”.
+                        </p>
+                        <p className="text-[11px] text-axiom-textMuted">
+                          Try clearing your search or switching back to all
+                          tokens.
+                        </p>
+                      </>
+                    )}
+
+                    {hasWatchlist && !trimmedQuery && (
+                      <>
+                        <p className="mb-1 text-axiom-textPrimary">
+                          Your watchlisted tokens are not available in this
+                          view.
+                        </p>
+                        <p className="text-[11px] text-axiom-textMuted">
+                          They may be filtered out by the current settings.
+                        </p>
+                      </>
+                    )}
+                  </>
+                ) : trimmedQuery ? (
                   <>
                     <p className="mb-1 text-axiom-textPrimary">
                       No tokens match “{trimmedQuery}”.

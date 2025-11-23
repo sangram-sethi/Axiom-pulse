@@ -79,8 +79,7 @@ const TOKENS = [
 ];
 
 export async function GET() {
-  // Simulate network delay for skeleton loading
-  await new Promise((resolve) => setTimeout(resolve, 700));
+  // small delay just for skeleton effect
+  await new Promise((resolve) => setTimeout(resolve, 600));
   return NextResponse.json(TOKENS);
 }
-

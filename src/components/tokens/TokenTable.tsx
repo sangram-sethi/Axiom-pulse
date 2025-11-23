@@ -1,48 +1,32 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { useTokensQuery } from "@/hooks/useTokensQuery";
-import { useAppSelector } from "@/hooks/useAppSelector";
+import React, { useMemo, useState } from "react";
 import type { Token } from "@/store/tokensSlice";
+import { useTokensQuery } from "@/hooks/useTokensQuery";
 import { useTokenSorting } from "@/hooks/useTokenSorting";
 import { usePriceSocket } from "@/hooks/usePriceSocket";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { TokenTableHeader } from "./TokenTableHeader";
+import { TokenTableError } from "./TokenTableError";
 import { TokenSkeletonRow } from "./TokenSkeletonRow";
 import { TokenRow } from "./TokenRow";
-import { TokenTableError } from "./TokenTableError";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export function TokenTable() {
-  const { isLoading, isError, error } = useTokensQuery();
+  const { data, isLoading, isError, error } = useTokensQuery();
   const [phase, setPhase] = useState<"new" | "final" | "migrated">("new");
-  const [visibleCount, setVisibleCount] = useState(5);
 
-  // Typed automatically by useAppSelector
-  const tokensById = useAppSelector((state) => state.tokens.byId);
-  const tokens: Token[] = useMemo(
-    () => Object.values(tokensById),
-    [tokensById]
-  );
+  const tokens: Token[] = data ?? [];
+
+  // Start WebSocket mock for live price updates
+  usePriceSocket(tokens);
 
   const phaseFiltered = useMemo(
     () => tokens.filter((t) => t.phase === phase),
     [tokens, phase]
   );
 
-  useEffect(() => {
-    if (!phaseFiltered.length) return;
-    setVisibleCount(Math.min(5, phaseFiltered.length));
-    const timeout = setTimeout(
-      () => setVisibleCount(phaseFiltered.length),
-      350
-    );
-    return () => clearTimeout(timeout);
-  }, [phaseFiltered]);
-
   const { sorted, sortKey, direction, toggleSort } =
     useTokenSorting(phaseFiltered);
-
-  usePriceSocket(tokens);
 
   if (isError) {
     return <TokenTableError message={error?.message} />;
@@ -58,18 +42,34 @@ export function TokenTable() {
           direction={direction}
           onSortChange={toggleSort}
         />
+
+        {/* Debug line – keep for now, remove later if you want */}
+        <div className="border-b border-slate-800/70 px-6 py-2 text-xs text-axiom-textMuted">
+          Debug: total tokens = {tokens.length}, current phase = {phase},
+          filtered = {phaseFiltered.length}, loading ={" "}
+          {isLoading ? "yes" : "no"}
+        </div>
+
         <div className="divide-y divide-slate-800/70">
+          {/* Skeleton while loading */}
           {isLoading &&
-            Array.from({ length: 6 }).map((_, idx) => (
+            Array.from({ length: 4 }).map((_, idx) => (
               <TokenSkeletonRow key={idx} />
             ))}
 
+          {/* Real Axiom-style rows */}
           {!isLoading &&
-            sorted
-              .slice(0, visibleCount)
-              .map((token) => <TokenRow key={token.id} token={token} />)}
+            sorted.map((token) => <TokenRow key={token.id} token={token} />)}
+
+          {/* Empty-state fallback (shouldn’t fire with our static data) */}
+          {!isLoading && !sorted.length && (
+            <div className="px-6 py-6 text-sm text-axiom-textMuted">
+              No tokens available for this category.
+            </div>
+          )}
         </div>
       </div>
     </ErrorBoundary>
   );
 }
+

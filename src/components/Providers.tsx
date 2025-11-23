@@ -26,13 +26,15 @@ export function Providers({ children }: ProvidersProps) {
       })
   );
 
+  const isDev = process.env.NODE_ENV === "development";
+
   return (
     <ReduxProvider store={store}>
       <QueryClientProvider client={queryClient}>
         {children}
-        {/* Remove devtools before final Lighthouse run if you want */}
-        <ReactQueryDevtools initialIsOpen={false} />
+        {isDev && <ReactQueryDevtools initialIsOpen={false} />}
       </QueryClientProvider>
     </ReduxProvider>
   );
 }
+

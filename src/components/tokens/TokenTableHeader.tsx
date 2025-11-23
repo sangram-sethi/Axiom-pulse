@@ -127,15 +127,10 @@ export function TokenTableHeader({
               onClick={() => onSortChange("txns")}
             />
           </div>
-          <div className="hidden lg:block">
-            <SortButton
-              label="Token Info"
-              sortKey="score"
-              activeKey={sortKey}
-              direction={direction}
-              onClick={() => onSortChange("score")}
-            />
-          </div>
+          <div className="hidden lg:block text-[11px] uppercase tracking-wide text-axiom-textMuted">
+  Token Info
+</div>
+
           <div className="text-right">Action</div>
         </div>
       </Tabs.Root>

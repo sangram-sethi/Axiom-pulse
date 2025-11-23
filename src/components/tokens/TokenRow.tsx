@@ -1,6 +1,7 @@
 "use client";
 
-import React, { memo, useEffect, useState } from "react";
+import React, { memo } from "react";
+import Image from "next/image";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import type { Token } from "@/store/tokensSlice";
 import { formatAge, formatCompactCurrency } from "@/lib/format";
@@ -22,19 +23,6 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
     (state) => state.tokens.runtime[token.id]
   );
 
-  const [flashDirection, setFlashDirection] = useState<"up" | "down" | null>(
-    null
-  );
-
-  useEffect(() => {
-    if (!runtime) return;
-    if (runtime.direction === "up" || runtime.direction === "down") {
-      setFlashDirection(runtime.direction);
-      const timeout = setTimeout(() => setFlashDirection(null), 350);
-      return () => clearTimeout(timeout);
-    }
-  }, [runtime?.direction]);
-
   const totalTxns = token.txns.buys + token.txns.sells;
   const price = runtime?.lastPriceUsd ?? token.priceUsd;
   const direction = runtime?.direction ?? "flat";
@@ -46,35 +34,27 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
       ? "text-axiom-negative"
       : "text-axiom-textPrimary";
 
-  const flashBg =
-    flashDirection === "up"
-      ? "bg-emerald-500/10"
-      : flashDirection === "down"
-      ? "bg-red-500/10"
-      : "";
-
   return (
     <div
       className={twMerge(
         "grid items-center border-b border-slate-800/70 px-4 py-3 text-sm md:px-6",
         "grid-cols-[minmax(0,2.5fr)_repeat(4,minmax(0,1.1fr))_minmax(0,2fr)_112px]",
-        "hover:bg-slate-900/40 transition-colors duration-150 ease-smooth",
-        flashBg
+        "hover:bg-slate-900/40 transition-colors duration-150 ease-smooth"
       )}
     >
       {/* Pair Info */}
       <div className="flex items-center gap-3">
-        <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-slate-800">
+        <div className="relative h-10 w-10 overflow-hidden rounded-xl bg-slate-800">
           {token.avatarUrl ? (
-            // if you later add real avatars
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={token.avatarUrl}
               alt={token.symbol}
-              className="h-full w-full object-cover"
+              fill
+              sizes="40px"
+              className="object-cover"
             />
           ) : (
-            <span className="text-xs text-axiom-textMuted">
+            <span className="flex h-full w-full items-center justify-center text-xs text-axiom-textMuted">
               {token.symbol.slice(0, 3)}
             </span>
           )}
@@ -85,12 +65,13 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
               {token.name}{" "}
               <span className="text-axiom-textMuted">{token.symbol}</span>
             </span>
-            <SimpleTooltip content={`Pair age: ${formatAge(token.ageMinutes)}`}>
-  <button className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-slate-800/80 text-[10px] text-axiom-textMuted">
-    i
-  </button>
-</SimpleTooltip>
-
+            <SimpleTooltip
+              content={`Pair age: ${formatAge(token.ageMinutes)}`}
+            >
+              <button className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-slate-800/80 text-[10px] text-axiom-textMuted">
+                i
+              </button>
+            </SimpleTooltip>
           </div>
           <div className="flex items-center gap-3 text-[11px] text-axiom-textMuted">
             <span>{formatAge(token.ageMinutes)}</span>
@@ -243,3 +224,4 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
     </div>
   );
 });
+

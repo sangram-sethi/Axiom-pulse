@@ -15,16 +15,21 @@ export function TokenTable() {
   const { data, isLoading, isError, error } = useTokensQuery();
   const [phase, setPhase] = useState<"new" | "final" | "migrated">("new");
 
-  const tokens: Token[] = data ?? [];
+  // Memoize tokens so we don't create a new array every render
+  const tokens = useMemo<Token[]>(() => {
+    return (data ?? []) as Token[];
+  }, [data]);
 
-  // Start WebSocket mock for live price updates
+  // Live price updates
   usePriceSocket(tokens);
 
+  // Filter by tab (phase)
   const phaseFiltered = useMemo(
     () => tokens.filter((t) => t.phase === phase),
     [tokens, phase]
   );
 
+  // Sorting
   const { sorted, sortKey, direction, toggleSort } =
     useTokenSorting(phaseFiltered);
 
@@ -34,42 +39,39 @@ export function TokenTable() {
 
   return (
     <ErrorBoundary>
-      <div className="overflow-hidden rounded-2xl border border-axiom-border bg-axiom-surface shadow-axiom-card">
-        <TokenTableHeader
-          activePhase={phase}
-          onPhaseChange={(v) => setPhase(v as typeof phase)}
-          sortKey={sortKey}
-          direction={direction}
-          onSortChange={toggleSort}
-        />
+      {/* Horizontal scroll on tiny screens */}
+      <div className="w-full overflow-x-auto">
+        <div className="min-w-[880px] rounded-2xl border border-axiom-border bg-axiom-surface shadow-axiom-card">
+          <TokenTableHeader
+            activePhase={phase}
+            onPhaseChange={(v) => setPhase(v as typeof phase)}
+            sortKey={sortKey}
+            direction={direction}
+            onSortChange={toggleSort}
+          />
 
-        {/* Debug line – keep for now, remove later if you want */}
-        <div className="border-b border-slate-800/70 px-6 py-2 text-xs text-axiom-textMuted">
-          Debug: total tokens = {tokens.length}, current phase = {phase},
-          filtered = {phaseFiltered.length}, loading ={" "}
-          {isLoading ? "yes" : "no"}
-        </div>
+          <div className="divide-y divide-slate-800/70">
+            {/* Skeleton while loading */}
+            {isLoading &&
+              Array.from({ length: 4 }).map((_, idx) => (
+                <TokenSkeletonRow key={idx} />
+              ))}
 
-        <div className="divide-y divide-slate-800/70">
-          {/* Skeleton while loading */}
-          {isLoading &&
-            Array.from({ length: 4 }).map((_, idx) => (
-              <TokenSkeletonRow key={idx} />
-            ))}
+            {/* Real rows */}
+            {!isLoading &&
+              sorted.map((token) => <TokenRow key={token.id} token={token} />)}
 
-          {/* Real Axiom-style rows */}
-          {!isLoading &&
-            sorted.map((token) => <TokenRow key={token.id} token={token} />)}
-
-          {/* Empty-state fallback (shouldn’t fire with our static data) */}
-          {!isLoading && !sorted.length && (
-            <div className="px-6 py-6 text-sm text-axiom-textMuted">
-              No tokens available for this category.
-            </div>
-          )}
+            {/* Empty-state fallback */}
+            {!isLoading && !sorted.length && (
+              <div className="px-6 py-6 text-sm text-axiom-textMuted">
+                No tokens available for this category.
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </ErrorBoundary>
   );
 }
+
 

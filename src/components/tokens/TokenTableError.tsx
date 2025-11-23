@@ -1,15 +1,37 @@
 "use client";
 
 import React from "react";
+import { Button } from "@/components/ui/Button";
 
 interface Props {
   message?: string;
+  onRetry?: () => void;
 }
 
-export function TokenTableError({ message }: Props) {
+export function TokenTableError({ message, onRetry }: Props) {
   return (
-    <div className="rounded-2xl border border-red-500/40 bg-red-500/5 px-6 py-4 text-sm text-red-300">
-      Failed to load tokens. {message ?? "Please try again."}
+    <div className="px-4 py-8 text-center text-sm text-axiom-textSecondary md:px-6">
+      <p className="mb-2 text-axiom-textPrimary">
+        Failed to load tokens.
+      </p>
+
+      {message && (
+        <p className="mb-4 text-[11px] text-axiom-textMuted">
+          {message}
+        </p>
+      )}
+
+      {onRetry && (
+        <Button
+          variant="outline"
+          size="md"
+          onClick={onRetry}
+          className="text-xs"
+        >
+          Retry
+        </Button>
+      )}
     </div>
   );
 }
+

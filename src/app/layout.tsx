@@ -5,8 +5,8 @@ import { TopNav } from "@/components/layout/TopNav";
 import { SearchProvider } from "@/context/SearchContext";
 
 export const metadata: Metadata = {
-  title: "AXIOM Pro • Pulse",
-  description: "Token discovery table clone",
+  title: "AXIOM Pulse",
+  description: "Pixel-perfect token discovery table with live price simulation, filters, and sorting.",
 };
 
 export default function RootLayout({

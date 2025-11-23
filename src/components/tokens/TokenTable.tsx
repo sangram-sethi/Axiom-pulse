@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import type { Token } from "@/store/tokensSlice";
 import { useTokensQuery } from "@/hooks/useTokensQuery";
 import { useTokenSorting } from "@/hooks/useTokenSorting";
@@ -11,11 +11,16 @@ import { TokenTableError } from "./TokenTableError";
 import { TokenSkeletonRow } from "./TokenSkeletonRow";
 import { TokenRow } from "./TokenRow";
 import { useSearch } from "@/context/SearchContext";
+import { store } from "@/store";
 
 export function TokenTable() {
-  const { data, isLoading, isError, error } = useTokensQuery();
+  const { data, isLoading, isError, error, refetch } = useTokensQuery();
   const [phase, setPhase] = useState<"new" | "final" | "migrated">("new");
   const { query } = useSearch();
+
+  // Last updated timestamp (in ms) and a ticking "now"
+  const [lastUpdated, setLastUpdated] = useState<number | null>(null);
+  const [now, setNow] = useState<number>(() => Date.now());
 
   // Memoize tokens from API / mock
   const tokens = useMemo<Token[]>(() => {
@@ -24,6 +29,30 @@ export function TokenTable() {
 
   // Live price updates via WebSocket mock
   usePriceSocket(tokens);
+
+  // Subscribe to Redux store as an "external system" and update lastUpdated in the callback
+  useEffect(() => {
+    const unsubscribe = store.subscribe(() => {
+      const state = store.getState();
+      const runtime = state.tokens.runtime;
+
+      if (!runtime || Object.keys(runtime).length === 0) return;
+
+      // This is inside the subscription callback, which React's rules allow
+      setLastUpdated(Date.now());
+    });
+
+    return unsubscribe;
+  }, []);
+
+  // Tick "now" every second so "Xs ago" updates smoothly
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(id);
+  }, []);
 
   // Search filter
   const searchFiltered = useMemo(() => {
@@ -46,9 +75,11 @@ export function TokenTable() {
   const { sorted, sortKey, direction, toggleSort } =
     useTokenSorting(phaseFiltered);
 
-  if (isError) {
-    return <TokenTableError message={error?.message} />;
-  }
+  const trimmedQuery = query.trim();
+  const secondsAgo =
+    lastUpdated != null
+      ? Math.max(0, Math.round((now - lastUpdated) / 1000))
+      : null;
 
   return (
     <ErrorBoundary>
@@ -68,20 +99,80 @@ export function TokenTable() {
             onSortChange={toggleSort}
           />
 
+          {/* Helper text + last updated */}
+          <div className="flex items-center justify-between px-4 pb-2 text-[11px] text-axiom-textMuted md:px-6">
+            <span className="hidden md:inline">
+              Click headers to sort · Live prices simulated
+            </span>
+            {secondsAgo !== null && (
+              <span className="ml-auto inline-flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                {secondsAgo < 2 ? (
+                  <span className="inline-flex items-center gap-1">
+                    Updated{" "}
+                    <span className="font-mono text-axiom-textPrimary">
+                      just now
+                    </span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1">
+                    Updated{" "}
+                    <span className="font-mono text-axiom-textPrimary">
+                      {secondsAgo}s
+                    </span>{" "}
+                    ago
+                  </span>
+                )}
+              </span>
+            )}
+          </div>
+
           <div>
+            {/* Error state with Retry */}
+            {isError && (
+              <TokenTableError
+                message={error?.message}
+                onRetry={() => refetch()}
+              />
+            )}
+
+            {/* Loading state */}
             {isLoading &&
+              !isError &&
               Array.from({ length: 4 }).map((_, idx) => (
                 <TokenSkeletonRow key={idx} />
               ))}
 
-            {!isLoading &&
-              sorted.map((token) => <TokenRow key={token.id} token={token} />)}
-
-            {!isLoading && !sorted.length && (
-              <div className="px-6 py-6 text-sm text-axiom-textMuted">
-                No tokens match your search.
+            {/* Empty state: no rows after filtering */}
+            {!isLoading && !isError && sorted.length === 0 && (
+              <div className="px-4 py-10 text-center text-sm text-axiom-textSecondary md:px-6">
+                {trimmedQuery ? (
+                  <>
+                    <p className="mb-1 text-axiom-textPrimary">
+                      No tokens match “{trimmedQuery}”.
+                    </p>
+                    <p className="text-[11px] text-axiom-textMuted">
+                      Try adjusting the phase filter or clearing your search.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="mb-1 text-axiom-textPrimary">
+                      No tokens available in this phase.
+                    </p>
+                    <p className="text-[11px] text-axiom-textMuted">
+                      Try switching to another tab or refreshing the data.
+                    </p>
+                  </>
+                )}
               </div>
             )}
+
+            {/* Normal rows */}
+            {!isLoading &&
+              !isError &&
+              sorted.length > 0 &&
+              sorted.map((token) => <TokenRow key={token.id} token={token} />)}
           </div>
         </div>
       </div>

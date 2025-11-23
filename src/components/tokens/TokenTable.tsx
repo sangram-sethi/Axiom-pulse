@@ -89,6 +89,30 @@ export function TokenTable() {
   const trimmedQuery = query.trim();
   const hasWatchlist = watchlistIds.length > 0;
 
+  // Pagination
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
+  const currentPage = Math.min(Math.max(page, 1), totalPages);
+
+  const paginated = useMemo<Token[]>(() => {
+    if (!sorted.length) return [];
+    const start = (currentPage - 1) * pageSize;
+    return sorted.slice(start, start + pageSize);
+  }, [sorted, currentPage, pageSize]);
+
+  const canPrev = currentPage > 1;
+  const canNext = currentPage < totalPages;
+
+  const handlePrevPage = () => {
+    setPage((prev) => (prev > 1 ? prev - 1 : prev));
+  };
+
+  const handleNextPage = () => {
+    setPage((prev) => (prev < totalPages ? prev + 1 : prev));
+  };
+
   const secondsAgo =
     lastUpdated != null
       ? Math.max(0, Math.round((now - lastUpdated) / 1000))
@@ -219,14 +243,78 @@ export function TokenTable() {
               </div>
             )}
 
-            {/* Normal rows */}
-            {!isLoading &&
-              !isError &&
-              sorted.length > 0 &&
-              sorted.map((token) => <TokenRow key={token.id} token={token} />)}
+            {/* Normal rows + pagination */}
+            {!isLoading && !isError && sorted.length > 0 && (
+              <>
+                {paginated.map((token) => (
+                  <TokenRow key={token.id} token={token} />
+                ))}
+
+                {/* Pagination bar */}
+                <div className="flex flex-col gap-2 border-t border-white/5 px-4 py-3 text-[11px] text-axiom-textMuted md:flex-row md:items-center md:justify-between md:px-6">
+                  <span>
+                    Showing{" "}
+                    <span className="font-mono text-axiom-textPrimary">
+                      {(currentPage - 1) * pageSize + 1}
+                    </span>{" "}
+                    –{" "}
+                    <span className="font-mono text-axiom-textPrimary">
+                      {Math.min(currentPage * pageSize, sorted.length)}
+                    </span>{" "}
+                    of{" "}
+                    <span className="font-mono text-axiom-textPrimary">
+                      {sorted.length}
+                    </span>
+                  </span>
+                  <div className="inline-flex items-center justify-end gap-1">
+                    <button
+                      type="button"
+                      onClick={handlePrevPage}
+                      disabled={!canPrev}
+                      className={`inline-flex items-center rounded-full border px-3 py-1 text-[11px] transition-colors
+                        ${
+                          canPrev
+                            ? "border-slate-700 bg-slate-900/80 text-axiom-textSecondary hover:bg-slate-800/80 cursor-pointer"
+                            : "border-slate-800 bg-slate-900/40 text-axiom-textMuted cursor-not-allowed"
+                        }
+                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-axiom-accent focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950`}
+                      aria-label="Previous page"
+                    >
+                      Previous
+                    </button>
+                    <span className="px-2 text-[11px]">
+                      Page{" "}
+                      <span className="font-mono text-axiom-textPrimary">
+                        {currentPage}
+                      </span>{" "}
+                      of{" "}
+                      <span className="font-mono text-axiom-textPrimary">
+                        {totalPages}
+                      </span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleNextPage}
+                      disabled={!canNext}
+                      className={`inline-flex items-center rounded-full border px-3 py-1 text-[11px] transition-colors
+                        ${
+                          canNext
+                            ? "border-slate-700 bg-slate-900/80 text-axiom-textSecondary hover:bg-slate-800/80 cursor-pointer"
+                            : "border-slate-800 bg-slate-900/40 text-axiom-textMuted cursor-not-allowed"
+                        }
+                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-axiom-accent focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950`}
+                      aria-label="Next page"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
     </ErrorBoundary>
   );
 }
+

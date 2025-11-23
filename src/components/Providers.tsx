@@ -19,8 +19,11 @@ export function Providers({ children }: ProvidersProps) {
       new QueryClient({
         defaultOptions: {
           queries: {
+            // ⚙️ Performance / UX tuning for token data
             refetchOnWindowFocus: false,
-            retry: 1,
+            staleTime: 30_000,   // data considered fresh for 30s
+            gcTime: 5 * 60_000,  // garbage-collect cache after 5 minutes
+            retry: 1,            // single retry on failure
           },
         },
       })
@@ -37,4 +40,3 @@ export function Providers({ children }: ProvidersProps) {
     </ReduxProvider>
   );
 }
-

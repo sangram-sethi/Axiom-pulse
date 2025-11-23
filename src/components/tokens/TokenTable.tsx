@@ -62,13 +62,13 @@ export function TokenTable() {
         >
           <TokenTableHeader
             activePhase={phase}
-            onPhaseChange={(v) => setPhase(v as typeof phase)}
+            onPhaseChange={(v) => setPhase(v)}
             sortKey={sortKey}
             direction={direction}
             onSortChange={toggleSort}
           />
 
-          <div className="divide-y divide-slate-800/70">
+          <div>
             {isLoading &&
               Array.from({ length: 4 }).map((_, idx) => (
                 <TokenSkeletonRow key={idx} />

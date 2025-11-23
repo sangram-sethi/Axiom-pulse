@@ -7,45 +7,60 @@ import type { SortKey } from "@/hooks/useTokenSorting";
 interface TokenTableHeaderProps {
   activePhase: "new" | "final" | "migrated";
   onPhaseChange: (phase: "new" | "final" | "migrated") => void;
-  sortKey: SortKey;
-  direction: "asc" | "desc";
+  sortKey: SortKey | null;
+  direction: "asc" | "desc" | null;
   onSortChange: (key: SortKey) => void;
 }
 
-interface SortButtonProps {
+interface HeaderSortButtonProps {
   label: string;
   sortKey: SortKey;
-  activeKey: SortKey;
-  direction: "asc" | "desc";
-  onClick: () => void;
+  activeSortKey: SortKey | null;
+  direction: "asc" | "desc" | null;
+  onSortChange: (key: SortKey) => void;
+  className?: string;
 }
 
-function SortButton({
+function HeaderSortButton({
   label,
   sortKey,
-  activeKey,
+  activeSortKey,
   direction,
-  onClick,
-}: SortButtonProps) {
-  const isActive = sortKey === activeKey;
+  onSortChange,
+  className,
+}: HeaderSortButtonProps) {
+  const isActive = activeSortKey === sortKey;
 
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={() => onSortChange(sortKey)}
       className={twMerge(
-        "inline-flex items-center gap-1 text-[11px] uppercase tracking-wide text-axiom-textMuted cursor-pointer",
-        "transition-colors duration-150 ease-smooth",
-        isActive && "text-axiom-textPrimary"
+        "inline-flex items-center gap-1 rounded-full px-2 py-1",
+        "text-[11px] uppercase tracking-wide",
+        "cursor-pointer transition-colors",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-axiom-accent focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
+        isActive
+          ? "bg-slate-800/80 text-axiom-textPrimary"
+          : "text-axiom-textMuted hover:text-axiom-textPrimary",
+        className
       )}
     >
       <span>{label}</span>
-      <span className="text-[9px]">
-        {isActive ? (direction === "asc" ? "↑" : "↓") : ""}
-      </span>
+      {isActive && (
+        <span aria-hidden="true" className="text-[10px]">
+          {direction === "asc" ? "↑" : "↓"}
+        </span>
+      )}
     </button>
   );
 }
+
+const PHASES: { id: "new" | "final" | "migrated"; label: string }[] = [
+  { id: "new", label: "New pairs" },
+  { id: "final", label: "Final stretch" },
+  { id: "migrated", label: "Migrated" },
+];
 
 export function TokenTableHeader({
   activePhase,
@@ -55,116 +70,115 @@ export function TokenTableHeader({
   onSortChange,
 }: TokenTableHeaderProps) {
   return (
-    <div className="border-b border-slate-800/70 px-4 pt-2.5 pb-2 md:px-6 md:pt-3 md:pb-2.5">
-      {/* Top row: colored phase pills */}
-      <div className="mb-2 flex items-center justify-between gap-3">
-        <div className="inline-flex rounded-full bg-slate-950/80 p-1">
-          {/* New Pairs */}
-          <button
-            type="button"
-            onClick={() => onPhaseChange("new")}
-            className={twMerge(
-              "inline-flex items-center justify-center rounded-full px-3 py-1 text-[11px] font-medium cursor-pointer",
-              "transition-colors duration-150 ease-smooth",
-              activePhase === "new"
-                ? "bg-emerald-500/25 text-emerald-200 border border-emerald-500/50 shadow-[0_0_0_1px_rgba(16,185,129,0.4)]"
-                : "bg-transparent text-axiom-textMuted hover:bg-emerald-500/10 hover:text-emerald-200"
-            )}
-          >
-            New Pairs
-          </button>
-
-          {/* Final Stretch */}
-          <button
-            type="button"
-            onClick={() => onPhaseChange("final")}
-            className={twMerge(
-              "inline-flex items-center justify-center rounded-full px-3 py-1 text-[11px] font-medium cursor-pointer",
-              "transition-colors duration-150 ease-smooth",
-              activePhase === "final"
-                ? "bg-amber-500/25 text-amber-200 border border-amber-500/50 shadow-[0_0_0_1px_rgba(245,158,11,0.4)]"
-                : "bg-transparent text-axiom-textMuted hover:bg-amber-500/10 hover:text-amber-200"
-            )}
-          >
-            Final Stretch
-          </button>
-
-          {/* Migrated */}
-          <button
-            type="button"
-            onClick={() => onPhaseChange("migrated")}
-            className={twMerge(
-              "inline-flex items-center justify-center rounded-full px-3 py-1 text-[11px] font-medium cursor-pointer",
-              "transition-colors duration-150 ease-smooth",
-              activePhase === "migrated"
-                ? "bg-indigo-500/25 text-indigo-200 border border-indigo-500/50 shadow-[0_0_0_1px_rgba(99,102,241,0.4)]"
-                : "bg-transparent text-axiom-textMuted hover:bg-indigo-500/10 hover:text-indigo-200"
-            )}
-          >
-            Migrated
-          </button>
+    <div className="border-b border-slate-800/80 px-4 pt-3 pb-2 md:px-6">
+      {/* Phase tabs + sort summary */}
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="inline-flex rounded-full bg-slate-900/80 p-0.5 text-xs">
+          {PHASES.map((phase) => {
+            const isActive = activePhase === phase.id;
+            return (
+              <button
+                key={phase.id}
+                type="button"
+                onClick={() => onPhaseChange(phase.id)}
+                className={twMerge(
+                  "px-3 py-1 rounded-full cursor-pointer transition-colors",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-axiom-accent focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
+                  isActive
+                    ? "bg-axiom-accent/90 text-slate-950"
+                    : "text-axiom-textSecondary hover:bg-slate-800/80"
+                )}
+              >
+                {phase.label}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Right: subtle helper text */}
         <div className="hidden text-[11px] text-axiom-textMuted md:block">
-          Click headers to sort • Live prices simulated
+          {sortKey && (
+            <>
+              Sorted by{" "}
+              <span className="font-mono text-axiom-textPrimary">
+                {sortKey}
+              </span>
+              {direction && (
+                <span className="text-axiom-textMuted">
+                  {" "}
+                  ({direction === "asc" ? "asc" : "desc"})
+                </span>
+              )}
+            </>
+          )}
         </div>
       </div>
 
       {/* Column headers */}
-      <div className="grid grid-cols-[minmax(0,2.5fr)_repeat(4,minmax(0,1.1fr))_minmax(0,2fr)_112px] items-center gap-3 text-[11px] uppercase tracking-wide text-axiom-textMuted">
-        <div>Pair</div>
+      <div
+        className={twMerge(
+          "grid items-center gap-2 text-[11px] uppercase tracking-wide text-axiom-textMuted",
+          "grid-cols-[minmax(0,2.5fr)_repeat(4,minmax(0,1.1fr))_minmax(0,2fr)_112px]"
+        )}
+      >
+        {/* Pair */}
+        <div className="flex items-center">
+          Pair
+        </div>
 
-        <div className="flex justify-start">
-          <SortButton
+        {/* Market Cap */}
+        <div className="flex items-center">
+          <HeaderSortButton
             label="MCap"
-            sortKey="marketCap"
-            activeKey={sortKey}
+            sortKey={"marketCap" as SortKey}
+            activeSortKey={sortKey}
             direction={direction}
-            onClick={() => onSortChange("marketCap")}
+            onSortChange={onSortChange}
           />
         </div>
 
-        <div className="hidden justify-start md:flex">
-          <SortButton
-            label="Liquidity"
-            sortKey="liquidity"
-            activeKey={sortKey}
+        {/* Liquidity */}
+        <div className="hidden items-center md:flex">
+          <HeaderSortButton
+            label="Liq"
+            sortKey={"liquidity" as SortKey}
+            activeSortKey={sortKey}
             direction={direction}
-            onClick={() => onSortChange("liquidity")}
+            onSortChange={onSortChange}
           />
         </div>
 
-        <div className="hidden justify-start lg:flex">
-          <SortButton
-            label="Volume 24h"
-            sortKey="volume24h"
-            activeKey={sortKey}
+        {/* Volume */}
+        <div className="hidden items-center lg:flex">
+          <HeaderSortButton
+            label="Volume"
+            sortKey={"volume24h" as SortKey}
+            activeSortKey={sortKey}
             direction={direction}
-            onClick={() => onSortChange("volume24h")}
+            onSortChange={onSortChange}
           />
         </div>
 
-        <div className="hidden justify-start lg:flex">
-          <SortButton
+        {/* TXNs */}
+        <div className="hidden items-center lg:flex">
+          <HeaderSortButton
             label="TXNs"
-            sortKey="txns"
-            activeKey={sortKey}
+            sortKey={"txns" as SortKey}
+            activeSortKey={sortKey}
             direction={direction}
-            onClick={() => onSortChange("txns")}
+            onSortChange={onSortChange}
           />
         </div>
 
-        {/* Token Info: static label, per-row popover handles details */}
-        <div className="hidden justify-start lg:flex text-[11px] uppercase tracking-wide text-axiom-textMuted">
-          Token Info
+        {/* Token info (not sortable) */}
+        <div className="hidden items-center lg:flex">
+          Token info
         </div>
 
-        <div className="flex justify-end text-[11px] uppercase tracking-wide text-axiom-textMuted">
-          Actions
+        {/* Action */}
+        <div className="flex items-center justify-end">
+          Action
         </div>
       </div>
     </div>
   );
 }
-

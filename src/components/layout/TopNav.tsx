@@ -21,7 +21,7 @@ export function TopNav() {
           <div className="flex items-center gap-2 md:gap-3">
             <div className="relative h-7 w-7 md:h-8 md:w-8">
               <Image
-                src="/axiom-logo.ico" // make sure this file exists in /public
+                src="/axiom-logo.ico"
                 alt="Axiom"
                 fill
                 sizes="32px"
@@ -80,16 +80,24 @@ export function TopNav() {
             </SimpleTooltip>
 
             {/* Bell: always visible */}
-            <button className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/80 text-axiom-textSecondary hover:bg-slate-800/80 cursor-pointer">
+            <button
+              type="button"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/80 text-axiom-textSecondary hover:bg-slate-800/80 cursor-pointer"
+              aria-label="Notifications"
+            >
               <Bell className="h-4 w-4" />
             </button>
 
             {/* Settings: always visible */}
-            <button className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/80 text-axiom-textSecondary hover:bg-slate-800/80 cursor-pointer">
+            <button
+              type="button"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/80 text-axiom-textSecondary hover:bg-slate-800/80 cursor-pointer"
+              aria-label="Settings"
+            >
               <Settings className="h-4 w-4" />
             </button>
 
-            {/* Login dialog – green pill, visible on all breakpoints */}
+            {/* Login dialog – green pill */}
             <Dialog.Root>
               <Dialog.Trigger asChild>
                 <Button
@@ -190,11 +198,15 @@ export function TopNav() {
               Connect
             </Button>
 
-            {/* Mobile menu button (shows dropdown with search + Connect) */}
+            {/* Mobile menu button (dropdown trigger) */}
             <button
               type="button"
               className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/80 text-axiom-textSecondary hover:bg-slate-800/80 cursor-pointer md:hidden"
               onClick={() => setMobileMenuOpen((v) => !v)}
+              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-nav-menu"
+              aria-haspopup="true"
             >
               <Menu className="h-4 w-4" />
             </button>
@@ -203,7 +215,12 @@ export function TopNav() {
 
         {/* Mobile dropdown: search + Live + Connect */}
         {mobileMenuOpen && (
-          <div className="mb-2 mt-1 space-y-2 rounded-2xl border border-slate-800 bg-slate-950/95 p-3 text-xs text-axiom-textSecondary shadow-lg shadow-black/50 md:hidden">
+          <div
+            id="mobile-nav-menu"
+            role="region"
+            aria-label="Axiom navigation options"
+            className="mb-2 mt-1 space-y-2 rounded-2xl border border-slate-800 bg-slate-950/95 p-3 text-xs text-axiom-textSecondary shadow-lg shadow-black/50 md:hidden"
+          >
             {/* Search for mobile */}
             <div className="flex items-center gap-2 rounded-full bg-slate-900/80 px-3 py-1.5">
               <Search className="h-3.5 w-3.5 shrink-0 text-axiom-textMuted" />

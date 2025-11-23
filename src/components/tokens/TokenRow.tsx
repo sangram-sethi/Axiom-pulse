@@ -136,7 +136,7 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
   return (
     <>
       {/* Mobile layout: summary + "More" details */}
-      <div className="flex flex-col border-t border-slate-800/80 px-4 py-3 text-sm md:hidden">
+      <div className="flex flex-col border-t border-white/5 bg-slate-900/30 px-4 py-3 text-sm md:hidden">
         {/* Top summary row */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex flex-1 items-center gap-3">
@@ -282,9 +282,11 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
       {/* Desktop layout: grid row + click for details dialog */}
       <div
         className={twMerge(
-          "group relative hidden cursor-pointer items-center border-t border-slate-800/80 px-4 py-3 text-sm md:grid md:px-6",
-          "grid-cols-[minmax(0,2.5fr)_repeat(4,minmax(0,1.1fr))_minmax(0,2fr)_112px]",
-          "hover:bg-slate-900/40 transition-colors duration-150 ease-smooth"
+        "group relative hidden cursor-pointer items-center px-4 py-3 text-sm md:grid md:px-6",
+        "grid-cols-[minmax(0,2.5fr)_repeat(4,minmax(0,1.1fr))_minmax(0,2fr)_112px]",
+        // glassy strip
+        "border-t border-white/5 bg-slate-900/25",
+        "hover:bg-slate-900/50 transition-colors duration-150 ease-smooth"
         )}
         role="button"
         tabIndex={0}

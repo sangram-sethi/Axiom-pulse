@@ -17,7 +17,7 @@ export function TopNav() {
         <div className="flex items-center gap-2 md:gap-3">
           <div className="relative h-7 w-7 md:h-8 md:w-8">
             <Image
-              src="/axiom-logo.svg" // in /public
+              src="/axiom-logo.ico" // in /public
               alt="Axiom"
               fill
               sizes="32px"
@@ -70,9 +70,12 @@ export function TopNav() {
           <Dialog.Root>
             <Dialog.Trigger asChild>
               <Button
-                variant="soft"
+                variant="ghost"
                 size="md"
-                className="hidden h-8 px-4 text-xs md:inline-flex"
+                className="hidden h-8 px-4 text-xs md:inline-flex
+                        bg-emerald-500 text-slate-950
+                        hover:bg-emerald-400
+                        border border-emerald-500/60"
               >
                 Login
               </Button>

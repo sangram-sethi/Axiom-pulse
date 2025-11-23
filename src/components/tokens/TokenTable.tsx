@@ -12,11 +12,19 @@ import { TokenSkeletonRow } from "./TokenSkeletonRow";
 import { TokenRow } from "./TokenRow";
 import { useSearch } from "@/context/SearchContext";
 import { store } from "@/store";
+import { useAppSelector } from "@/hooks/useAppSelector";
+
+type Phase = "new" | "final" | "migrated" | "watchlist";
 
 export function TokenTable() {
   const { data, isLoading, isError, error, refetch } = useTokensQuery();
-  const [phase, setPhase] = useState<"new" | "final" | "migrated">("new");
+  const [phase, setPhase] = useState<Phase>("new");
   const { query } = useSearch();
+
+  const liveUpdatesEnabled = useAppSelector(
+    (state) => state.ui.preferences.liveUpdatesEnabled
+  );
+  const watchlistIds = useAppSelector((state) => state.ui.watchlist);
 
   // Last updated timestamp (in ms) and a ticking "now"
   const [lastUpdated, setLastUpdated] = useState<number | null>(null);
@@ -27,8 +35,8 @@ export function TokenTable() {
     return (data ?? []) as Token[];
   }, [data]);
 
-  // Live price updates via WebSocket mock
-  usePriceSocket(tokens);
+  // Live price updates via WebSocket mock (respect user preference)
+  usePriceSocket(liveUpdatesEnabled ? tokens : []);
 
   // Subscribe to Redux store as an "external system" and update lastUpdated in the callback
   useEffect(() => {
@@ -38,7 +46,6 @@ export function TokenTable() {
 
       if (!runtime || Object.keys(runtime).length === 0) return;
 
-      // This is inside the subscription callback, which React's rules allow
       setLastUpdated(Date.now());
     });
 
@@ -65,11 +72,15 @@ export function TokenTable() {
     );
   }, [tokens, query]);
 
-  // Phase filter (New / Final Stretch / Migrated)
-  const phaseFiltered = useMemo(
-    () => searchFiltered.filter((t) => t.phase === phase),
-    [searchFiltered, phase]
-  );
+  // Phase + watchlist filter
+  const phaseFiltered = useMemo(() => {
+    if (phase === "watchlist") {
+      if (!watchlistIds.length) return [];
+      const set = new Set(watchlistIds);
+      return searchFiltered.filter((t) => set.has(t.id));
+    }
+    return searchFiltered.filter((t) => t.phase === phase);
+  }, [searchFiltered, phase, watchlistIds]);
 
   // Sorting
   const { sorted, sortKey, direction, toggleSort } =
@@ -158,10 +169,10 @@ export function TokenTable() {
                 ) : (
                   <>
                     <p className="mb-1 text-axiom-textPrimary">
-                      No tokens available in this phase.
+                      No tokens available in this view.
                     </p>
                     <p className="text-[11px] text-axiom-textMuted">
-                      Try switching to another tab or refreshing the data.
+                      Try switching tabs or updating your watchlist.
                     </p>
                   </>
                 )}

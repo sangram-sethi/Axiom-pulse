@@ -1,9 +1,13 @@
+"use client";
+
 import { configureStore } from "@reduxjs/toolkit";
 import tokensReducer from "./tokensSlice";
+import uiReducer from "./uiSlice";
 
 export const store = configureStore({
   reducer: {
     tokens: tokensReducer,
+    ui: uiReducer,
   },
 });
 

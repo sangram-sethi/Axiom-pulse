@@ -1,17 +1,23 @@
 "use client";
 
 import React from "react";
-import * as Tabs from "@radix-ui/react-tabs";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { clsx } from "clsx";
-import type { SortDirection, SortKey } from "@/hooks/useTokenSorting";
+import { twMerge } from "tailwind-merge";
+import type { SortKey } from "@/hooks/useTokenSorting";
 
-interface HeaderProps {
-  activePhase: string;
-  onPhaseChange: (value: string) => void;
+interface TokenTableHeaderProps {
+  activePhase: "new" | "final" | "migrated";
+  onPhaseChange: (phase: "new" | "final" | "migrated") => void;
   sortKey: SortKey;
-  direction: SortDirection;
+  direction: "asc" | "desc";
   onSortChange: (key: SortKey) => void;
+}
+
+interface SortButtonProps {
+  label: string;
+  sortKey: SortKey;
+  activeKey: SortKey;
+  direction: "asc" | "desc";
+  onClick: () => void;
 }
 
 function SortButton({
@@ -20,29 +26,23 @@ function SortButton({
   activeKey,
   direction,
   onClick,
-}: {
-  label: string;
-  sortKey: SortKey;
-  activeKey: SortKey;
-  direction: SortDirection;
-  onClick: () => void;
-}) {
+}: SortButtonProps) {
   const isActive = sortKey === activeKey;
+
   return (
     <button
+      type="button"
       onClick={onClick}
-      className={clsx(
-        "inline-flex items-center gap-1 text-[11px] uppercase tracking-wide text-axiom-textMuted",
-        "hover:text-axiom-textPrimary transition-colors"
+      className={twMerge(
+        "inline-flex items-center gap-1 text-[11px] uppercase tracking-wide text-axiom-textMuted cursor-pointer",
+        "transition-colors duration-150 ease-smooth",
+        isActive && "text-axiom-textPrimary"
       )}
     >
-      {label}
-      {isActive &&
-        (direction === "desc" ? (
-          <ChevronDown className="h-3 w-3" />
-        ) : (
-          <ChevronUp className="h-3 w-3" />
-        ))}
+      <span>{label}</span>
+      <span className="text-[9px]">
+        {isActive ? (direction === "asc" ? "↑" : "↓") : ""}
+      </span>
     </button>
   );
 }
@@ -53,87 +53,118 @@ export function TokenTableHeader({
   sortKey,
   direction,
   onSortChange,
-}: HeaderProps) {
+}: TokenTableHeaderProps) {
   return (
-    <div className="border-b border-slate-800/80 px-4 pt-3 md:px-6">
-      <Tabs.Root value={activePhase} onValueChange={onPhaseChange}>
-        <div className="mb-2 flex items-center justify-between gap-4">
-          {/* Tabs for columns */}
-          <Tabs.List className="inline-flex rounded-full bg-slate-900/80 p-1 text-xs">
-            <Tabs.Trigger
-              value="new"
-              className="inline-flex min-w-[90px] items-center justify-center rounded-full px-3 py-1.5 text-[11px] text-axiom-textMuted data-[state=active]:bg-slate-700 data-[state=active]:text-axiom-textPrimary"
-            >
-              New Pairs
-            </Tabs.Trigger>
-            <Tabs.Trigger
-              value="final"
-              className="inline-flex min-w-[110px] items-center justify-center rounded-full px-3 py-1.5 text-[11px] text-axiom-textMuted data-[state=active]:bg-slate-700 data-[state=active]:text-axiom-textPrimary"
-            >
-              Final Stretch
-            </Tabs.Trigger>
-            <Tabs.Trigger
-              value="migrated"
-              className="inline-flex min-w-[100px] items-center justify-center rounded-full px-3 py-1.5 text-[11px] text-axiom-textMuted data-[state=active]:bg-slate-700 data-[state=active]:text-axiom-textPrimary"
-            >
-              Migrated
-            </Tabs.Trigger>
-          </Tabs.List>
+    <div className="border-b border-slate-800/70 px-4 pt-2.5 pb-2 md:px-6 md:pt-3 md:pb-2.5">
+      {/* Top row: colored phase pills */}
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <div className="inline-flex rounded-full bg-slate-950/80 p-1">
+          {/* New Pairs */}
+          <button
+            type="button"
+            onClick={() => onPhaseChange("new")}
+            className={twMerge(
+              "inline-flex items-center justify-center rounded-full px-3 py-1 text-[11px] font-medium cursor-pointer",
+              "transition-colors duration-150 ease-smooth",
+              activePhase === "new"
+                ? "bg-emerald-500/25 text-emerald-200 border border-emerald-500/50 shadow-[0_0_0_1px_rgba(16,185,129,0.4)]"
+                : "bg-transparent text-axiom-textMuted hover:bg-emerald-500/10 hover:text-emerald-200"
+            )}
+          >
+            New Pairs
+          </button>
 
-          <div className="hidden items-center gap-3 text-[11px] text-axiom-textMuted md:flex">
-            <span className="rounded-full bg-slate-900/80 px-3 py-1">
-              5m view
-            </span>
-            <span>Filter ▾</span>
-          </div>
+          {/* Final Stretch */}
+          <button
+            type="button"
+            onClick={() => onPhaseChange("final")}
+            className={twMerge(
+              "inline-flex items-center justify-center rounded-full px-3 py-1 text-[11px] font-medium cursor-pointer",
+              "transition-colors duration-150 ease-smooth",
+              activePhase === "final"
+                ? "bg-amber-500/25 text-amber-200 border border-amber-500/50 shadow-[0_0_0_1px_rgba(245,158,11,0.4)]"
+                : "bg-transparent text-axiom-textMuted hover:bg-amber-500/10 hover:text-amber-200"
+            )}
+          >
+            Final Stretch
+          </button>
+
+          {/* Migrated */}
+          <button
+            type="button"
+            onClick={() => onPhaseChange("migrated")}
+            className={twMerge(
+              "inline-flex items-center justify-center rounded-full px-3 py-1 text-[11px] font-medium cursor-pointer",
+              "transition-colors duration-150 ease-smooth",
+              activePhase === "migrated"
+                ? "bg-indigo-500/25 text-indigo-200 border border-indigo-500/50 shadow-[0_0_0_1px_rgba(99,102,241,0.4)]"
+                : "bg-transparent text-axiom-textMuted hover:bg-indigo-500/10 hover:text-indigo-200"
+            )}
+          >
+            Migrated
+          </button>
         </div>
 
-        {/* Column names row */}
-        <div className="grid grid-cols-[minmax(0,2.5fr)_repeat(4,minmax(0,1.1fr))_minmax(0,2fr)_112px] gap-4 pb-2 text-[11px] uppercase tracking-wide text-axiom-textMuted">
-          <div>Pair Info</div>
-          <div>
-            <SortButton
-              label="Market Cap"
-              sortKey="marketCap"
-              activeKey={sortKey}
-              direction={direction}
-              onClick={() => onSortChange("marketCap")}
-            />
-          </div>
-          <div className="hidden md:block">
-            <SortButton
-              label="Liquidity"
-              sortKey="liquidity"
-              activeKey={sortKey}
-              direction={direction}
-              onClick={() => onSortChange("liquidity")}
-            />
-          </div>
-          <div className="hidden lg:block">
-            <SortButton
-              label="Volume"
-              sortKey="volume24h"
-              activeKey={sortKey}
-              direction={direction}
-              onClick={() => onSortChange("volume24h")}
-            />
-          </div>
-          <div className="hidden lg:block">
-            <SortButton
-              label="Txns"
-              sortKey="txns"
-              activeKey={sortKey}
-              direction={direction}
-              onClick={() => onSortChange("txns")}
-            />
-          </div>
-          <div className="hidden lg:block text-[11px] uppercase tracking-wide text-axiom-textMuted">
-  Token Info
-</div>
-
-          <div className="text-right">Action</div>
+        {/* Right: subtle helper text */}
+        <div className="hidden text-[11px] text-axiom-textMuted md:block">
+          Click headers to sort • Live prices simulated
         </div>
-      </Tabs.Root>
+      </div>
+
+      {/* Column headers */}
+      <div className="grid grid-cols-[minmax(0,2.5fr)_repeat(4,minmax(0,1.1fr))_minmax(0,2fr)_112px] items-center gap-3 text-[11px] uppercase tracking-wide text-axiom-textMuted">
+        <div>Pair</div>
+
+        <div className="flex justify-start">
+          <SortButton
+            label="MCap"
+            sortKey="marketCap"
+            activeKey={sortKey}
+            direction={direction}
+            onClick={() => onSortChange("marketCap")}
+          />
+        </div>
+
+        <div className="hidden justify-start md:flex">
+          <SortButton
+            label="Liquidity"
+            sortKey="liquidity"
+            activeKey={sortKey}
+            direction={direction}
+            onClick={() => onSortChange("liquidity")}
+          />
+        </div>
+
+        <div className="hidden justify-start lg:flex">
+          <SortButton
+            label="Volume 24h"
+            sortKey="volume24h"
+            activeKey={sortKey}
+            direction={direction}
+            onClick={() => onSortChange("volume24h")}
+          />
+        </div>
+
+        <div className="hidden justify-start lg:flex">
+          <SortButton
+            label="TXNs"
+            sortKey="txns"
+            activeKey={sortKey}
+            direction={direction}
+            onClick={() => onSortChange("txns")}
+          />
+        </div>
+
+        {/* Token Info: static label, per-row popover handles details */}
+        <div className="hidden justify-start lg:flex text-[11px] uppercase tracking-wide text-axiom-textMuted">
+          Token Info
+        </div>
+
+        <div className="flex justify-end text-[11px] uppercase tracking-wide text-axiom-textMuted">
+          Actions
+        </div>
+      </div>
     </div>
   );
 }
+

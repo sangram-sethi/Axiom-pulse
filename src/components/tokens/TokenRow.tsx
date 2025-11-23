@@ -39,7 +39,7 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
       className={twMerge(
         "grid items-center border-b border-slate-800/70 px-4 py-3 text-sm md:px-6",
         "grid-cols-[minmax(0,2.5fr)_repeat(4,minmax(0,1.1fr))_minmax(0,2fr)_112px]",
-        "hover:bg-slate-900/40 transition-colors duration-150 ease-smooth"
+        "hover:bg-slate-900/40 transition-colors duration-150ease-smooth"
       )}
     >
       {/* Pair Info */}
@@ -68,7 +68,7 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
             <SimpleTooltip
               content={`Pair age: ${formatAge(token.ageMinutes)}`}
             >
-              <button className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-slate-800/80 text-[10px] text-axiom-textMuted">
+              <button className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-slate-800/80 text-[10px] text-axiom-textMuted cursor-pointer">
                 i
               </button>
             </SimpleTooltip>
@@ -132,7 +132,7 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
       <div className="hidden items-center justify-start lg:flex">
         <Popover.Root>
           <Popover.Trigger asChild>
-            <button className="inline-flex items-center rounded-full bg-slate-800/80 px-3 py-1 text-[11px] text-axiom-textSecondary hover:bg-slate-700/70">
+            <button className="inline-flex items-center rounded-full bg-slate-800/80 px-3 py-1 text-[11px] text-axiom-textSecondary hover:bg-slate-700/70 cursor-pointer">
               <Info className="mr-1 h-3 w-3" />
               Score {token.score}
             </button>
@@ -176,7 +176,9 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
       <div className="flex items-center justify-end">
         <Dialog.Root>
           <Dialog.Trigger asChild>
-            <Button className="h-8 min-w-[70px] text-xs">Buy</Button>
+            <Button className="h-8 min-w-[70px] text-xs">
+              Buy
+            </Button>
           </Dialog.Trigger>
           <Dialog.Portal>
             <Dialog.Overlay className="fixed inset-0 bg-black/70" />
@@ -209,11 +211,13 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
                   className="h-9 flex-1 rounded-lg border border-slate-700 bg-slate-900 px-3 text-xs outline-none placeholder:text-axiom-textMuted"
                   placeholder="Amount in SOL"
                 />
-                <Button className="h-9 px-4 text-xs">Place Order</Button>
+                <Button className="h-9 px-4 text-xs">
+                  Place Order
+                </Button>
               </div>
 
               <Dialog.Close asChild>
-                <button className="absolute right-3 top-3 text-xs text-axiom-textMuted hover:text-axiom-textPrimary">
+                <button className="absolute right-3 top-3 text-xs text-axiom-textMuted hover:text-axiom-textPrimary cursor-pointer">
                   Close
                 </button>
               </Dialog.Close>
@@ -224,4 +228,5 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
     </div>
   );
 });
+
 

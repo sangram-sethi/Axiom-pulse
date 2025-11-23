@@ -1,37 +1,49 @@
 "use client";
 
 import * as React from "react";
-import type { ButtonHTMLAttributes } from "react";
-import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-type Variant = "primary" | "ghost" | "soft";
+export type ButtonVariant = "primary" | "soft" | "outline" | "ghost";
+export type ButtonSize = "sm" | "md" | "lg";
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: Variant;
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
 }
 
-const base =
-  "inline-flex items-center justify-center rounded-full text-sm font-medium transition-colors duration-150 ease-smooth focus:outline-none focus-visible:ring-2 focus-visible:ring-axiom-accent focus-visible:ring-offset-2 focus-visible:ring-offset-axiom-bg disabled:opacity-50 disabled:cursor-not-allowed";
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  function Button(
+    { variant = "primary", size = "md", className, ...props },
+    ref
+  ) {
+    const base =
+      "inline-flex items-center justify-center rounded-full font-medium whitespace-nowrap " +
+      "cursor-pointer select-none outline-none transition-colors duration-150 ease-smooth " +
+      "focus-visible:ring-2 focus-visible:ring-axiom-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950";
 
-const variantClasses: Record<Variant, string> = {
-  primary:
-    "bg-gradient-to-r from-axiom-accent to-axiom-accentSoft text-white px-5 py-1.5 shadow-md hover:brightness-110",
-  ghost:
-    "bg-transparent text-axiom-textSecondary hover:bg-slate-800/60 px-3 py-1",
-  soft:
-    "bg-slate-800/80 text-axiom-textPrimary px-4 py-1.5 hover:bg-slate-700/80",
-};
+    const variants: Record<ButtonVariant, string> = {
+      primary: "bg-axiom-accent text-white hover:bg-axiom-accent/90",
+      soft:
+        "bg-slate-900/80 text-axiom-textPrimary hover:bg-slate-800/80 border border-slate-700/80",
+      outline:
+        "border border-slate-700 text-axiom-textPrimary hover:bg-slate-900/60",
+      ghost: "text-axiom-textSecondary hover:bg-slate-900/70",
+    };
 
-export const Button: React.FC<ButtonProps> = ({
-  variant = "primary",
-  className,
-  ...props
-}) => {
-  return (
-    <button
-      {...props}
-      className={twMerge(base, clsx(variantClasses[variant], className))}
-    />
-  );
-};
+    const sizes: Record<ButtonSize, string> = {
+      sm: "h-7 px-3 text-[11px]",
+      md: "h-8 px-4 text-xs",
+      lg: "h-10 px-5 text-sm",
+    };
+
+    return (
+      <button
+        ref={ref}
+        className={twMerge(base, variants[variant], sizes[size], className)}
+        {...props}
+      />
+    );
+  }
+);
+

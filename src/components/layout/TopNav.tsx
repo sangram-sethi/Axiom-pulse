@@ -6,6 +6,7 @@ import { Search, Bell, Settings, Menu } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useSearch } from "@/context/SearchContext";
+import { SimpleTooltip } from "@/components/ui/SimpleTooltip";
 
 export function TopNav() {
   const { query, setQuery } = useSearch();
@@ -67,11 +68,16 @@ export function TopNav() {
 
           {/* Right: controls */}
           <div className="flex items-center gap-1.5 md:gap-2.5">
-            {/* Live pill — desktop only */}
-            <button className="hidden items-center rounded-full bg-slate-900/80 px-3 py-1 text-[11px] text-axiom-textSecondary hover:bg-slate-800/80 cursor-pointer md:inline-flex">
-              <span className="mr-1 inline-block h-2 w-2 rounded-full bg-emerald-500" />
-              Live
-            </button>
+            {/* Live pill — desktop only, with tooltip */}
+            <SimpleTooltip content="Prices are simulated and refresh every 3 seconds">
+              <button
+                type="button"
+                className="hidden items-center rounded-full bg-slate-900/80 px-3 py-1 text-[11px] text-axiom-textSecondary hover:bg-slate-800/80 cursor-pointer md:inline-flex"
+              >
+                <span className="mr-1 inline-block h-2 w-2 rounded-full bg-emerald-500" />
+                Live
+              </button>
+            </SimpleTooltip>
 
             {/* Bell: always visible */}
             <button className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/80 text-axiom-textSecondary hover:bg-slate-800/80 cursor-pointer">

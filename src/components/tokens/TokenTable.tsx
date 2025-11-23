@@ -17,12 +17,12 @@ export function TokenTable() {
   const [phase, setPhase] = useState<"new" | "final" | "migrated">("new");
   const { query } = useSearch();
 
-  // Memoize tokens from API
+  // Memoize tokens from API / mock
   const tokens = useMemo<Token[]>(() => {
     return (data ?? []) as Token[];
   }, [data]);
 
-  // Live price updates
+  // Live price updates via WebSocket mock
   usePriceSocket(tokens);
 
   // Search filter
@@ -36,7 +36,7 @@ export function TokenTable() {
     );
   }, [tokens, query]);
 
-  // Phase filter
+  // Phase filter (New / Final Stretch / Migrated)
   const phaseFiltered = useMemo(
     () => searchFiltered.filter((t) => t.phase === phase),
     [searchFiltered, phase]
@@ -53,10 +53,13 @@ export function TokenTable() {
   return (
     <ErrorBoundary>
       <div className="w-full overflow-x-auto">
-        <div className="min-w-[880px] rounded-2xl border border-slate-800/80
-                bg-linear-to-b from-slate-950/90 to-slate-900/90
-                shadow-[0_18px_45px_rgba(0,0,0,0.75)]
-                backdrop-blur-md">
+        {/* Main card container */}
+        <div
+          className="min-w-[880px] rounded-2xl border border-slate-800/80
+                     bg-gradient-to-b from-slate-950/90 to-slate-900/90
+                     shadow-[0_18px_45px_rgba(0,0,0,0.75)]
+                     backdrop-blur-md"
+        >
           <TokenTableHeader
             activePhase={phase}
             onPhaseChange={(v) => setPhase(v as typeof phase)}
@@ -85,6 +88,3 @@ export function TokenTable() {
     </ErrorBoundary>
   );
 }
-
-
-

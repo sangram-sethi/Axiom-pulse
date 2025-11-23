@@ -48,6 +48,17 @@ export function TopNav() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
+              {/* Clear button – only when query is non-empty */}
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-800 text-[10px] text-axiom-textMuted hover:bg-slate-700 hover:text-axiom-textPrimary cursor-pointer"
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              )}
               <span className="hidden rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-axiom-textMuted md:inline-flex">
                 ⌘K
               </span>
@@ -88,66 +99,78 @@ export function TopNav() {
               </Dialog.Trigger>
               <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 bg-black/70" />
-                <Dialog.Content className="fixed left-1/2 top-1/2 w-[360px] max-w-[90vw] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-slate-800 bg-axiom-surface p-4 shadow-2xl shadow-black/60">
-                  <Dialog.Title className="mb-1.5 text-sm font-semibold">
-                    Login
-                  </Dialog.Title>
-                  <Dialog.Description className="mb-4 text-xs text-axiom-textSecondary">
-                    Enter your credentials to continue.
-                  </Dialog.Description>
+                <Dialog.Content
+                  className="fixed left-1/2 top-1/2 w-[360px] max-w-[90vw]
+                             -translate-x-1/2 -translate-y-1/2
+                             overflow-hidden rounded-2xl border border-slate-800
+                             bg-slate-950 shadow-2xl shadow-black/70"
+                >
+                  {/* Top accent bar */}
+                  <div className="h-1 w-full bg-gradient-to-r from-emerald-400 via-sky-400 to-indigo-500" />
 
-                  <form className="space-y-3 text-xs">
-                    <div className="space-y-1">
-                      <label className="block text-[11px] text-axiom-textMuted">
-                        Username
-                      </label>
-                      <input
-                        type="text"
-                        className="h-9 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-xs text-axiom-textPrimary outline-none placeholder:text-axiom-textMuted"
-                        placeholder="Enter username"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="block text-[11px] text-axiom-textMuted">
-                        Password
-                      </label>
-                      <input
-                        type="password"
-                        className="h-9 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-xs text-axiom-textPrimary outline-none placeholder:text-axiom-textMuted"
-                        placeholder="Enter password"
-                      />
-                    </div>
-
-                    <Button
-                      type="button"
-                      variant="primary"
-                      size="md"
-                      className="w-full"
-                    >
-                      Login
-                    </Button>
-                  </form>
-
-                  <div className="mt-3 flex items-center justify-between text-[11px]">
-                    <button
-                      type="button"
-                      className="text-axiom-textMuted underline-offset-2 hover:text-axiom-textPrimary hover:underline cursor-pointer"
-                    >
-                      Forgot password?
-                    </button>
-                    <button
-                      type="button"
-                      className="text-axiom-accent underline-offset-2 hover:text-axiom-accent/90 hover:underline cursor-pointer"
-                    >
-                      Sign up
-                    </button>
-                  </div>
-
+                  {/* Close button */}
                   <Dialog.Close asChild>
                     <button className="absolute right-3 top-3 text-xs text-axiom-textMuted hover:text-axiom-textPrimary cursor-pointer">
                       Close
                     </button>
                   </Dialog.Close>
+
+                  {/* Inner content */}
+                  <div className="p-4 pt-5">
+                    <Dialog.Title className="mb-1.5 text-sm font-semibold">
+                      Login
+                    </Dialog.Title>
+                    <Dialog.Description className="mb-4 text-xs text-axiom-textSecondary">
+                      Enter your credentials to continue.
+                    </Dialog.Description>
+
+                    <form className="space-y-3 text-xs">
+                      <div className="space-y-1">
+                        <label className="block text-[11px] text-axiom-textMuted">
+                          Username
+                        </label>
+                        <input
+                          type="text"
+                          className="h-9 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-xs text-axiom-textPrimary outline-none placeholder:text-axiom-textMuted"
+                          placeholder="Enter username"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="block text-[11px] text-axiom-textMuted">
+                          Password
+                        </label>
+                        <input
+                          type="password"
+                          className="h-9 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-xs text-axiom-textPrimary outline-none placeholder:text-axiom-textMuted"
+                          placeholder="Enter password"
+                        />
+                      </div>
+
+                      <Button
+                        type="button"
+                        variant="primary"
+                        size="md"
+                        className="w-full"
+                      >
+                        Login
+                      </Button>
+                    </form>
+
+                    <div className="mt-3 flex items-center justify-between text-[11px]">
+                      <button
+                        type="button"
+                        className="text-axiom-textMuted underline-offset-2 hover:text-axiom-textPrimary hover:underline cursor-pointer"
+                      >
+                        Forgot password?
+                      </button>
+                      <button
+                        type="button"
+                        className="text-axiom-accent underline-offset-2 hover:text-axiom-accent/90 hover:underline cursor-pointer"
+                      >
+                        Sign up
+                      </button>
+                    </div>
+                  </div>
                 </Dialog.Content>
               </Dialog.Portal>
             </Dialog.Root>
@@ -184,6 +207,17 @@ export function TopNav() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
+              {/* Clear button – mobile search */}
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-800 text-[10px] text-axiom-textMuted hover:bg-slate-700 hover:text-axiom-textPrimary cursor-pointer"
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              )}
             </div>
 
             {/* Live + Connect inside dropdown */}
@@ -192,7 +226,12 @@ export function TopNav() {
                 <span className="mr-1 inline-block h-2 w-2 rounded-full bg-emerald-500" />
                 Connection stable
               </span>
-              <Button variant="primary" size="md" className="h-8 px-4 text-xs">
+              <Button
+                variant="primary"
+                size="md"
+                className="h-8 px-4 text-xs"
+                onClick={() => setMobileMenuOpen(false)}
+              >
                 Connect
               </Button>
             </div>

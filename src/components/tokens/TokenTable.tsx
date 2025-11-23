@@ -53,7 +53,10 @@ export function TokenTable() {
   return (
     <ErrorBoundary>
       <div className="w-full overflow-x-auto">
-        <div className="min-w-[880px] rounded-2xl border border-axiom-border bg-axiom-surface shadow-axiom-card">
+        <div className="min-w-[880px] rounded-2xl border border-slate-800/80
+                bg-linear-to-b from-slate-950/90 to-slate-900/90
+                shadow-[0_18px_45px_rgba(0,0,0,0.75)]
+                backdrop-blur-md">
           <TokenTableHeader
             activePhase={phase}
             onPhaseChange={(v) => setPhase(v as typeof phase)}

@@ -34,8 +34,12 @@ body {
 }
 
 body {
-  @apply bg-axiom-bg;
+  @apply bg-slate-950 text-axiom-textPrimary antialiased;
+  background-image: radial-gradient(circle at top, rgba(96,165,250,0.22), transparent 60%),
+                    radial-gradient(circle at bottom, rgba(56,189,248,0.18), transparent 60%);
+  background-attachment: fixed;
 }
+
 
 /* Scrollbars (optional) */
 * {

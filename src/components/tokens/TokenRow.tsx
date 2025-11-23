@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import type { Token } from "@/store/tokensSlice";
 import { formatAge, formatCompactCurrency } from "@/lib/format";
-import { SimpleTooltip } from "@/components/ui/SimpleTooltip";
+// import { SimpleTooltip } from "@/components/ui/SimpleTooltip"; // removed
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Popover from "@radix-ui/react-popover";
 import { Button } from "@/components/ui/Button";
@@ -37,12 +37,14 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
   return (
     <div
       className={twMerge(
-  "grid items-center border-b border-slate-800/70 px-4 py-3 text-sm md:px-6",
-  "grid-cols-[minmax(0,2.5fr)_repeat(4,minmax(0,1.1fr))_minmax(0,2fr)_112px]",
-  "hover:bg-slate-900/40 transition-colors duration-150 ease-smooth"
-)}
-
+        "group relative grid items-center border-t border-slate-800/80 px-4 py-3 text-sm md:px-6",
+        "grid-cols-[minmax(0,2.5fr)_repeat(4,minmax(0,1.1fr))_minmax(0,2fr)_112px]",
+        "hover:bg-slate-900/40 transition-colors duration-150 ease-smooth"
+      )}
     >
+      {/* Left accent bar on hover */}
+      <div className="pointer-events-none absolute inset-y-1 left-0 w-[3px] rounded-full bg-axiom-accent/0 transition-colors duration-200 group-hover:bg-axiom-accent/80" />
+
       {/* Pair Info */}
       <div className="flex items-center gap-3">
         <div className="relative h-10 w-10 overflow-hidden rounded-xl bg-slate-800">
@@ -66,14 +68,36 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
               {token.name}{" "}
               <span className="text-axiom-textMuted">{token.symbol}</span>
             </span>
-            <SimpleTooltip
-              content={`Pair age: ${formatAge(token.ageMinutes)}`}
-            >
-              <button className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-slate-800/80 text-[10px] text-axiom-textMuted cursor-pointer">
-                i
-              </button>
-            </SimpleTooltip>
+
+            {/* Small "i" icon – now click-based popover, not row-hover tooltip */}
+            <Popover.Root>
+              <Popover.Trigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-slate-800/80 text-[10px] text-axiom-textMuted cursor-pointer hover:bg-slate-700/80"
+                  aria-label={`View age info for ${token.symbol}`}
+                >
+                  i
+                </button>
+              </Popover.Trigger>
+              <Popover.Portal>
+                <Popover.Content
+                  side="top"
+                  sideOffset={8}
+                  className="rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-[11px] text-axiom-textSecondary shadow-lg shadow-black/60"
+                >
+                  <div className="mb-1 text-[10px] uppercase tracking-wide text-axiom-textMuted">
+                    Pair age
+                  </div>
+                  <div className="font-mono tabular-nums text-xs text-axiom-textPrimary">
+                    {formatAge(token.ageMinutes)}
+                  </div>
+                  <Popover.Arrow className="fill-slate-950" />
+                </Popover.Content>
+              </Popover.Portal>
+            </Popover.Root>
           </div>
+
           <div className="flex items-center gap-3 text-[11px] text-axiom-textMuted">
             <span>{formatAge(token.ageMinutes)}</span>
             <span className="inline-flex items-center gap-1">
@@ -90,12 +114,12 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
 
       {/* Market Cap */}
       <div className="flex flex-col">
-        <span className="text-[13px]">
+        <span className="text-[13px] font-mono tabular-nums">
           {formatCompactCurrency(token.marketCap)}
         </span>
         <span
           className={clsx(
-            "text-[11px]",
+            "text-[11px] font-mono tabular-nums",
             token.priceChangePct >= 0
               ? "text-axiom-positive"
               : "text-axiom-negative"
@@ -108,22 +132,22 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
 
       {/* Liquidity */}
       <div className="hidden flex-col md:flex">
-        <span className="text-[13px]">
+        <span className="text-[13px] font-mono tabular-nums">
           {formatCompactCurrency(token.liquidity)}
         </span>
       </div>
 
       {/* Volume */}
       <div className="hidden flex-col lg:flex">
-        <span className="text-[13px]">
+        <span className="text-[13px] font-mono tabular-nums">
           {formatCompactCurrency(token.volume24h)}
         </span>
       </div>
 
       {/* Txns */}
       <div className="hidden flex-col lg:flex">
-        <span className="text-[13px]">{totalTxns}</span>
-        <span className="text-[11px] text-axiom-positive">
+        <span className="text-[13px] font-mono tabular-nums">{totalTxns}</span>
+        <span className="text-[11px] font-mono tabular-nums text-axiom-positive">
           {token.txns.buys}{" "}
           <span className="text-axiom-textMuted">/ {token.txns.sells}</span>
         </span>
@@ -133,7 +157,11 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
       <div className="hidden items-center justify-start lg:flex">
         <Popover.Root>
           <Popover.Trigger asChild>
-            <button className="inline-flex items-center rounded-full bg-slate-800/80 px-3 py-1 text-[11px] text-axiom-textSecondary hover:bg-slate-700/70 cursor-pointer">
+            <button
+              type="button"
+              className="inline-flex items-center rounded-full bg-slate-800/80 px-3 py-1 text-[11px] text-axiom-textSecondary hover:bg-slate-700/70 cursor-pointer"
+              aria-label={`View token info for ${token.symbol}`}
+            >
               <Info className="mr-1 h-3 w-3" />
               Score {token.score}
             </button>
@@ -157,17 +185,24 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
                 </div>
                 <div className="flex justify-between">
                   <span>Market cap</span>
-                  <span>{formatCompactCurrency(token.marketCap)}</span>
+                  <span className="font-mono tabular-nums">
+                    {formatCompactCurrency(token.marketCap)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>24h volume</span>
-                  <span>{formatCompactCurrency(token.volume24h)}</span>
+                  <span className="font-mono tabular-nums">
+                    {formatCompactCurrency(token.volume24h)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>TXNs</span>
-                  <span>{totalTxns}</span>
+                  <span className="font-mono tabular-nums">
+                    {totalTxns}
+                  </span>
                 </div>
               </div>
+              <Popover.Arrow className="fill-axiom-surface" />
             </Popover.Content>
           </Popover.Portal>
         </Popover.Root>
@@ -195,15 +230,26 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
               <div className="mb-4 space-y-2 text-xs">
                 <div className="flex justify-between">
                   <span>Price</span>
-                  <span className={priceColor}>${price.toFixed(6)}</span>
+                  <span
+                    className={twMerge(
+                      "font-mono tabular-nums transition-colors duration-300",
+                      priceColor
+                    )}
+                  >
+                    ${price.toFixed(6)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Market cap</span>
-                  <span>{formatCompactCurrency(token.marketCap)}</span>
+                  <span className="font-mono tabular-nums">
+                    {formatCompactCurrency(token.marketCap)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>24h Volume</span>
-                  <span>{formatCompactCurrency(token.volume24h)}</span>
+                  <span className="font-mono tabular-nums">
+                    {formatCompactCurrency(token.volume24h)}
+                  </span>
                 </div>
               </div>
 
@@ -229,5 +275,3 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
     </div>
   );
 });
-
-

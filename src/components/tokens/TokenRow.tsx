@@ -37,10 +37,11 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
   return (
     <div
       className={twMerge(
-        "grid items-center border-b border-slate-800/70 px-4 py-3 text-sm md:px-6",
-        "grid-cols-[minmax(0,2.5fr)_repeat(4,minmax(0,1.1fr))_minmax(0,2fr)_112px]",
-        "hover:bg-slate-900/40 transition-colors duration-150ease-smooth"
-      )}
+  "grid items-center border-b border-slate-800/70 px-4 py-3 text-sm md:px-6",
+  "grid-cols-[minmax(0,2.5fr)_repeat(4,minmax(0,1.1fr))_minmax(0,2fr)_112px]",
+  "hover:bg-slate-900/40 transition-colors duration-150 ease-smooth"
+)}
+
     >
       {/* Pair Info */}
       <div className="flex items-center gap-3">

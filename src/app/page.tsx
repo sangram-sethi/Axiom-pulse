@@ -1,11 +1,9 @@
 import React from "react";
-import { TopNav } from "@/components/layout/TopNav";
 import { TokenTable } from "@/components/tokens/TokenTable";
 
 export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col bg-axiom-bg text-axiom-textPrimary">
-      <TopNav />
 
       <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 pb-8 pt-5 md:px-6">
         {/* Secondary header (Trending / time filter) */}

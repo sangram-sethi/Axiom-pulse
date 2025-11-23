@@ -10,12 +10,14 @@ import { TokenTableHeader } from "./TokenTableHeader";
 import { TokenTableError } from "./TokenTableError";
 import { TokenSkeletonRow } from "./TokenSkeletonRow";
 import { TokenRow } from "./TokenRow";
+import { useSearch } from "@/context/SearchContext";
 
 export function TokenTable() {
   const { data, isLoading, isError, error } = useTokensQuery();
   const [phase, setPhase] = useState<"new" | "final" | "migrated">("new");
+  const { query } = useSearch();
 
-  // Memoize tokens so we don't create a new array every render
+  // Memoize tokens from API
   const tokens = useMemo<Token[]>(() => {
     return (data ?? []) as Token[];
   }, [data]);
@@ -23,10 +25,21 @@ export function TokenTable() {
   // Live price updates
   usePriceSocket(tokens);
 
-  // Filter by tab (phase)
+  // Search filter
+  const searchFiltered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return tokens;
+    return tokens.filter(
+      (t) =>
+        t.name.toLowerCase().includes(q) ||
+        t.symbol.toLowerCase().includes(q)
+    );
+  }, [tokens, query]);
+
+  // Phase filter
   const phaseFiltered = useMemo(
-    () => tokens.filter((t) => t.phase === phase),
-    [tokens, phase]
+    () => searchFiltered.filter((t) => t.phase === phase),
+    [searchFiltered, phase]
   );
 
   // Sorting
@@ -39,7 +52,6 @@ export function TokenTable() {
 
   return (
     <ErrorBoundary>
-      {/* Horizontal scroll on tiny screens */}
       <div className="w-full overflow-x-auto">
         <div className="min-w-[880px] rounded-2xl border border-axiom-border bg-axiom-surface shadow-axiom-card">
           <TokenTableHeader
@@ -51,20 +63,17 @@ export function TokenTable() {
           />
 
           <div className="divide-y divide-slate-800/70">
-            {/* Skeleton while loading */}
             {isLoading &&
               Array.from({ length: 4 }).map((_, idx) => (
                 <TokenSkeletonRow key={idx} />
               ))}
 
-            {/* Real rows */}
             {!isLoading &&
               sorted.map((token) => <TokenRow key={token.id} token={token} />)}
 
-            {/* Empty-state fallback */}
             {!isLoading && !sorted.length && (
               <div className="px-6 py-6 text-sm text-axiom-textMuted">
-                No tokens available for this category.
+                No tokens match your search.
               </div>
             )}
           </div>
@@ -73,5 +82,6 @@ export function TokenTable() {
     </ErrorBoundary>
   );
 }
+
 
 

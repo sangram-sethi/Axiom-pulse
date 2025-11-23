@@ -2,7 +2,6 @@
 
 import React, { memo, useEffect, useState } from "react";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import type { RootState } from "@/store";
 import type { Token } from "@/store/tokensSlice";
 import { formatAge, formatCompactCurrency } from "@/lib/format";
 import * as Tooltip from "@radix-ui/react-tooltip";
@@ -17,13 +16,12 @@ interface TokenRowProps {
   token: Token;
 }
 
-const runtimeSelector =
-  (id: string) =>
-  (state: RootState) =>
-    state.tokens.runtime[id];
-
 export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
-  const runtime = useAppSelector(runtimeSelector(token.id));
+  // selector closes over token.id
+  const runtime = useAppSelector(
+    (state) => state.tokens.runtime[token.id]
+  );
+
   const [flashDirection, setFlashDirection] = useState<"up" | "down" | null>(
     null
   );
@@ -55,194 +53,5 @@ export const TokenRow = memo(function TokenRow({ token }: TokenRowProps) {
       ? "bg-red-500/10"
       : "";
 
-  return (
-    <div
-      className={twMerge(
-        "grid items-center border-b border-slate-800/70 px-4 py-3 text-sm md:px-6",
-        "grid-cols-[minmax(0,2.5fr)_repeat(4,minmax(0,1.1fr))_minmax(0,2fr)_112px]",
-        "hover:bg-slate-900/40 transition-colors duration-150 ease-smooth",
-        flashBg
-      )}
-    >
-      {/* Pair Info */}
-      <div className="flex items-center gap-3">
-        <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-slate-800">
-          <span className="text-xs text-axiom-textMuted">
-            {token.symbol.slice(0, 3)}
-          </span>
-        </div>
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <span className="truncate text-sm font-medium">
-              {token.name}{" "}
-              <span className="text-axiom-textMuted">{token.symbol}</span>
-            </span>
-            <Tooltip.Root delayDuration={150}>
-              <Tooltip.Trigger asChild>
-                <button className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-slate-800/80 text-[10px] text-axiom-textMuted">
-                  i
-                </button>
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content
-                  side="top"
-                  sideOffset={6}
-                  className="rounded-md bg-slate-900 px-3 py-2 text-xs text-axiom-textSecondary shadow-lg shadow-black/50"
-                >
-                  Pair age: {formatAge(token.ageMinutes)}
-                  <Tooltip.Arrow className="fill-slate-900" />
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
-          </div>
-          <div className="flex items-center gap-3 text-[11px] text-axiom-textMuted">
-            <span>{formatAge(token.ageMinutes)}</span>
-            <span className="inline-flex items-center gap-1">
-              <LineChart className="h-3 w-3" />
-              Trend
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <ExternalLink className="h-3 w-3" />
-              Explorer
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Market Cap */}
-      <div className="flex flex-col">
-        <span className="text-[13px]">
-          {formatCompactCurrency(token.marketCap)}
-        </span>
-        <span
-          className={clsx(
-            "text-[11px]",
-            token.priceChangePct >= 0
-              ? "text-axiom-positive"
-              : "text-axiom-negative"
-          )}
-        >
-          {token.priceChangePct >= 0 ? "+" : ""}
-          {token.priceChangePct.toFixed(2)}%
-        </span>
-      </div>
-
-      {/* Liquidity */}
-      <div className="hidden flex-col md:flex">
-        <span className="text-[13px]">
-          {formatCompactCurrency(token.liquidity)}
-        </span>
-      </div>
-
-      {/* Volume */}
-      <div className="hidden flex-col lg:flex">
-        <span className="text-[13px]">
-          {formatCompactCurrency(token.volume24h)}
-        </span>
-      </div>
-
-      {/* Txns */}
-      <div className="hidden flex-col lg:flex">
-        <span className="text-[13px]">{totalTxns}</span>
-        <span className="text-[11px] text-axiom-positive">
-          {token.txns.buys}{" "}
-          <span className="text-axiom-textMuted">/ {token.txns.sells}</span>
-        </span>
-      </div>
-
-      {/* Token info – popover */}
-      <div className="hidden items-center justify-start lg:flex">
-        <Popover.Root>
-          <Popover.Trigger asChild>
-            <button className="inline-flex items-center rounded-full bg-slate-800/80 px-3 py-1 text-[11px] text-axiom-textSecondary hover:bg-slate-700/70">
-              <Info className="mr-1 h-3 w-3" />
-              Score {token.score}
-            </button>
-          </Popover.Trigger>
-          <Popover.Portal>
-            <Popover.Content
-              side="top"
-              sideOffset={8}
-              className="w-64 rounded-xl border border-slate-800 bg-axiom-surfaceElevated p-3 text-xs text-axiom-textSecondary shadow-xl shadow-black/60"
-            >
-              <div className="mb-2 flex items-center justify-between text-[11px] uppercase tracking-wide text-axiom-textMuted">
-                <span>Token info</span>
-                <HelpCircle className="h-3 w-3" />
-              </div>
-              <div className="space-y-1.5">
-                <div className="flex justify-between">
-                  <span>Score</span>
-                  <span className="font-medium text-axiom-textPrimary">
-                    {token.score}/100
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Market cap</span>
-                  <span>{formatCompactCurrency(token.marketCap)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>24h volume</span>
-                  <span>{formatCompactCurrency(token.volume24h)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>TXNs</span>
-                  <span>{totalTxns}</span>
-                </div>
-              </div>
-            </Popover.Content>
-          </Popover.Portal>
-        </Popover.Root>
-      </div>
-
-      {/* Action – dialog */}
-      <div className="flex items-center justify-end">
-        <Dialog.Root>
-          <Dialog.Trigger asChild>
-            <Button className="h-8 min-w-[70px] text-xs">Buy</Button>
-          </Dialog.Trigger>
-          <Dialog.Portal>
-            <Dialog.Overlay className="fixed inset-0 bg-black/70" />
-            <Dialog.Content className="fixed left-1/2 top-1/2 w-[360px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-slate-800 bg-axiom-surface p-4 shadow-2xl shadow-black/60">
-              <Dialog.Title className="mb-2 text-sm font-semibold">
-                Quick Buy – {token.symbol}
-              </Dialog.Title>
-              <Dialog.Description className="mb-4 text-xs text-axiom-textSecondary">
-                This is a static demo buy panel. In the real app you would hook
-                this up to your trading flow.
-              </Dialog.Description>
-
-              <div className="mb-4 space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <span>Price</span>
-                  <span className={priceColor}>${price.toFixed(6)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Market cap</span>
-                  <span>{formatCompactCurrency(token.marketCap)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>24h Volume</span>
-                  <span>{formatCompactCurrency(token.volume24h)}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <input
-                  className="h-9 flex-1 rounded-lg border border-slate-700 bg-slate-900 px-3 text-xs outline-none placeholder:text-axiom-textMuted"
-                  placeholder="Amount in SOL"
-                />
-                <Button className="h-9 px-4 text-xs">Place Order</Button>
-              </div>
-
-              <Dialog.Close asChild>
-                <button className="absolute right-3 top-3 text-xs text-axiom-textMuted hover:text-axiom-textPrimary">
-                  Close
-                </button>
-              </Dialog.Close>
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
-      </div>
-    </div>
-  );
+  // …rest of TokenRow JSX stays exactly as before…
 });

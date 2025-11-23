@@ -3,7 +3,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTokensQuery } from "@/hooks/useTokensQuery";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import type { RootState } from "@/store";
 import type { Token } from "@/store/tokensSlice";
 import { useTokenSorting } from "@/hooks/useTokenSorting";
 import { usePriceSocket } from "@/hooks/usePriceSocket";
@@ -14,11 +13,12 @@ import { TokenTableError } from "./TokenTableError";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export function TokenTable() {
-  const { data, isLoading, isError, error } = useTokensQuery();
+  const { isLoading, isError, error } = useTokensQuery();
   const [phase, setPhase] = useState<"new" | "final" | "migrated">("new");
   const [visibleCount, setVisibleCount] = useState(5);
 
-  const tokensById = useAppSelector((state: RootState) => state.tokens.byId);
+  // Typed automatically by useAppSelector
+  const tokensById = useAppSelector((state) => state.tokens.byId);
   const tokens: Token[] = useMemo(
     () => Object.values(tokensById),
     [tokensById]
@@ -29,7 +29,6 @@ export function TokenTable() {
     [tokens, phase]
   );
 
-  // Progressive loading effect
   useEffect(() => {
     if (!phaseFiltered.length) return;
     setVisibleCount(Math.min(5, phaseFiltered.length));
@@ -43,7 +42,6 @@ export function TokenTable() {
   const { sorted, sortKey, direction, toggleSort } =
     useTokenSorting(phaseFiltered);
 
-  // Live price updates
   usePriceSocket(tokens);
 
   if (isError) {

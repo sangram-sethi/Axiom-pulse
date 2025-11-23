@@ -1,0 +1,86 @@
+import { NextResponse } from "next/server";
+
+const TOKENS = [
+  {
+    id: "fwog",
+    name: "FWOG",
+    symbol: "FWOG",
+    ageMinutes: 60 * 24,
+    avatarUrl: "",
+    phase: "new",
+    priceUsd: 0.00045,
+    priceChangePct: 1.48,
+    marketCap: 6_630_000,
+    liquidity: 1_750_000,
+    volume24h: 31_300,
+    txns: { buys: 49, sells: 38 },
+    score: 86,
+  },
+  {
+    id: "believe",
+    name: "BELIEVE",
+    symbol: "BELIEVE",
+    ageMinutes: 5,
+    avatarUrl: "",
+    phase: "new",
+    priceUsd: 0.0011,
+    priceChangePct: 65.2,
+    marketCap: 11_600,
+    liquidity: 13_900,
+    volume24h: 23_100,
+    txns: { buys: 305, sells: 131 },
+    score: 92,
+  },
+  {
+    id: "apa",
+    name: "APA",
+    symbol: "APA",
+    ageMinutes: 21,
+    avatarUrl: "",
+    phase: "final",
+    priceUsd: 0.00036,
+    priceChangePct: 32.75,
+    marketCap: 361_000,
+    liquidity: 24_800,
+    volume24h: 12_300,
+    txns: { buys: 220, sells: 79 },
+    score: 80,
+  },
+  {
+    id: "foreign",
+    name: "FOREIGN",
+    symbol: "FOREIGN",
+    ageMinutes: 50,
+    avatarUrl: "",
+    phase: "final",
+    priceUsd: 0.00011,
+    priceChangePct: -0.57,
+    marketCap: 112_000,
+    liquidity: 32_300,
+    volume24h: 7_930,
+    txns: { buys: 112, sells: 44 },
+    score: 71,
+  },
+  {
+    id: "mutt",
+    name: "MUTT Official Pump",
+    symbol: "MUTT",
+    ageMinutes: 60,
+    avatarUrl: "",
+    phase: "migrated",
+    priceUsd: 0.00018,
+    priceChangePct: 11.22,
+    marketCap: 183_000,
+    liquidity: 41_500,
+    volume24h: 9_190,
+    txns: { buys: 112, sells: 52 },
+    score: 88,
+  },
+];
+
+export async function GET() {
+  // Simulate network delay for skeleton loading
+  await new Promise((resolve) => setTimeout(resolve, 700));
+  return NextResponse.json(TOKENS);
+}
+

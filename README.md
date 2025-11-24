@@ -12,7 +12,7 @@ It showcases **real-time token price updates**, **rich interactions** (popover /
   👉 `https://axiom-pulse-beta.vercel.app/`
 
 - **YouTube walkthrough (1–2 min):**  
-  🎥 `https://youtu.be/your-video-id`  <!-- replace with your video -->
+  🎥 `https://www.youtube.com/watch?v=fyxL2niepbI`
 
 - **GitHub repo:**  
   💻 `https://github.com/sangram-sethi/Axiom-pulse`

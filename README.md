@@ -43,6 +43,12 @@ It showcases **real-time token price updates**, **rich interactions** (popover /
   - **Search:** Global search by name/symbol with shared state across desktop & mobile nav.
   - **Phase filters:** Pills above table filter blocks of tokens (`new`, `final`, `migrated`, `watchlist`).
 
+- **Pagination**
+  - Client-side pagination with a default page size of 10 rows.
+  - “Showing X–Y of Z” summary and “Previous / Next” controls.
+  - Buttons are keyboard-focusable, with proper disabled states at the edges.
+  - Helps keep DOM size small and interactions snappy even as the dataset grows.
+
 ### 2.2. Interaction patterns (popover / tooltip / modals)
 
 - **Popovers**
@@ -182,7 +188,7 @@ src/
     layout/
       TopNav.tsx          # Top navigation, search, login dialog, mobile menu
     tokens/
-      TokenTable.tsx      # Main table: phases, sorting, filters, rows
+      TokenTable.tsx      # Main table: phases, sorting, filters, pagination, rows
       TokenTableHeader.tsx# Header with phase tabs + MCap sort
       TokenRow.tsx        # Row (desktop grid + mobile card), dialogs, popovers
       TokenSkeletonRow.tsx# Loading shimmer

@@ -9,13 +9,13 @@ It showcases **real-time token price updates**, **rich interactions** (popover /
 ## 1. Live Demo & Video
 
 - **Vercel deployment:**  
-  👉 `https://your-vercel-url.vercel.app`  <!-- replace with your URL -->
+  👉 `https://axiom-pulse-beta.vercel.app/`
 
 - **YouTube walkthrough (1–2 min):**  
   🎥 `https://youtu.be/your-video-id`  <!-- replace with your video -->
 
 - **GitHub repo:**  
-  💻 `https://github.com/your-username/axiom-pulse`  <!-- replace with repo URL -->
+  💻 `https://github.com/sangram-sethi/Axiom-pulse`
 
 ---
 
@@ -44,8 +44,8 @@ It showcases **real-time token price updates**, **rich interactions** (popover /
   - **Phase filters:** Pills above table filter blocks of tokens (`new`, `final`, `migrated`, `watchlist`).
 
 - **Pagination**
-  - Client-side pagination with a default page size of 10 rows.
-  - “Showing X–Y of Z” summary and “Previous / Next” controls.
+  - Client-side pagination with a default page size of **10 rows**.
+  - “Showing X–Y of Z” summary and **Previous / Next** controls.
   - Buttons are keyboard-focusable, with proper disabled states at the edges.
   - Helps keep DOM size small and interactions snappy even as the dataset grows.
 
@@ -61,10 +61,11 @@ It showcases **real-time token price updates**, **rich interactions** (popover /
 
 - **Modals / dialogs**
   - **Login modal** in top nav:
-    - Glass-style dialog with top accent bar and CTA.
+    - Glass-style dialog with subtle accent and CTA.
     - Username + password fields, with “Forgot password” and “Sign up” links.
   - **Token buy dialog**:
     - Per-row “Buy” button opens a Radix Dialog with price, mcap, volume and a quick “Place Order” input.
+    - Demonstrates how a real trading flow could be embedded.
   - **Token details dialog**:
     - Clicking a desktop row opens a “Token details” dialog summarising key metrics (price, change, mcap, volume, age, txns).
 
@@ -121,10 +122,9 @@ It showcases **real-time token price updates**, **rich interactions** (popover /
 - **Tech:** Tailwind CSS v4 (PostCSS-based, no `tailwind.config.js`), custom Axiom-inspired color palette.
 - **Main card:**
   - Glassmorphism:
-    - `bg-slate-900/40` with radial gradient overlays.
-    - `backdrop-blur-2xl`.
-    - Outer border `border-white/8` + subtle inner highlight border.
-  - Shadow: `shadow-[0_18px_45px_rgba(0,0,0,0.85)]` for depth.
+    - Dark, slightly translucent background with gradient on desktop.
+    - Strong depth via shadow (desktop) and a lighter variant on mobile.
+  - Shadow: `shadow-[0_18px_45px_rgba(0,0,0,0.85)]` for depth on larger screens.
 
 - **Rows:**
   - Desktop rows are:
@@ -172,9 +172,28 @@ The goal was to keep the layout within ~**2px of the Axiom Pulse page**, includi
 
 ---
 
-## 6. Architecture & State Management
+## 6. Responsive Layout Snapshots (Auto-layout)
 
-### 6.1. Project structure
+The layout is responsive down to **320px** width.  
+Snapshots were captured using **Chrome DevTools** responsive mode and are stored in the `docs/` folder.
+
+### Desktop – 1440px
+
+![Desktop layout at 1440px](docs/desktop-1440.png)
+
+### Mobile – 320px
+
+![Mobile layout at 320px](docs/mobile-320(1).png)
+
+### Mobile – 320px
+
+![Mobile layout at 320px](docs/mobile-320.png)
+
+---
+
+## 7. Architecture & State Management
+
+### 7.1. Project structure
 
 ```text
 src/
@@ -213,3 +232,4 @@ src/
 
   lib/
     format.ts             # Formatting (compact currency, age strings)
+

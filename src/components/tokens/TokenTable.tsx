@@ -18,7 +18,7 @@ type Phase = "new" | "final" | "migrated" | "watchlist";
 
 export function TokenTable() {
   const { data, isLoading, isError, error, refetch } = useTokensQuery();
-  const [phase, setPhase] = useState<Phase>("new");
+  const [phase, setPhase] = useState<Phase>("migrated");
   const { query } = useSearch();
 
   const liveUpdatesEnabled = useAppSelector(
